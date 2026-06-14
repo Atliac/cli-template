@@ -1,0 +1,18 @@
+[workspace.package]
+version = "0.0.1"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+authors = ["Atliac"]
+description = "cli-template"
+repository = "https://github.com/atliac/cli-template"
+documentation = "https://docs.rs/cli-template"
+homepage = "https://github.com/atliac/cli-template"
+readme = "README.md"
+keywords = [""]
+categories = [""]
+
+[workspace]
+resolver = "3"
+members = ["cli-template"]
+
+[workspace.dependencies]
