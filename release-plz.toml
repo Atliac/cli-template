@@ -1,0 +1,25 @@
+# https://release-plz.dev/docs/config
+[workspace]
+
+# Automatically update the changelog with the new version and release notes
+changelog_update = true
+
+# update dependencies with `cargo update`
+dependencies_update = false
+
+# We disable GitHub Release creation in release-plz.
+# We do this because cargo-dist is much better at creating the release page,
+# compiling cross-platform binaries, and attaching installer scripts.
+# https://axodotdev.github.io/cargo-dist/book/quickstart/rust.html
+git_release_enable = false
+
+# Labels to apply to the release pull request opened by release-plz
+pr_labels = ["release"]
+
+# Don't publish to crates.io by default.
+publish = false
+
+# package-specific settings. These override the workspace settings above.
+[[package]]
+name = "cli-template"
+publish = false
