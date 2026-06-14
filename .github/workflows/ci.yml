@@ -18,7 +18,7 @@ jobs:
   # Running this on Windows/macOS is redundant and consumes extra CI minutes.
   # ==============================================================================
   fmt:
-    name: Formatting
+    name: CI-Formatting
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -38,7 +38,7 @@ jobs:
   # (e.g., #[cfg(target_os = "windows")]), which triggers different lints on different OSs.
   # ==============================================================================
   clippy:
-    name: Clippy (${{ matrix.os }})
+    name: CI-Clippy (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false # Keep running on other OSs even if one fails
@@ -61,7 +61,7 @@ jobs:
   # Crucial for verifying platform-specific behaviors, file systems, and OS-specific APIs.
   # ==============================================================================
   test:
-    name: Test (${{ matrix.os }})
+    name: CI-Test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -82,7 +82,7 @@ jobs:
   # Ensures rustdoc compiles successfully across all operating systems.
   # ==============================================================================
   docs:
-    name: Docs (${{ matrix.os }})
+    name: CI-Docs (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
