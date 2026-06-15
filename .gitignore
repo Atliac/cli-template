@@ -11,34 +11,78 @@ rustc-ice-*.txt
 # MSVC Windows debugging files
 *.pdb
 
-# ==============================================================================
-# General Dotfile Blanket Rule
-# ==============================================================================
-# Ignore all files and directories starting with a dot.
-.*
-
-# --- EXCEPTIONS (Do NOT ignore these) ---
-# Negate the blanket ignore above for directories and configurations essential
-# for team collaboration and repository workflows.
-!.git/            # CRUCIAL: Prevents CI and copy tools from skipping the .git folder
-!.gitignore
-!.gitattributes
-!.editorconfig
-!.github/
-!.cargo/
-
 
 # ==============================================================================
-# Secrets & Credentials (Safety Net)
+# Local AI Agents & Vibe Coding State
 # ==============================================================================
-# Additional safety rules to catch credentials that might not start with a dot.
-.env*
+# Universal agent instruction file
+AGENTS.md
+
+# Cursor
+.cursor/
+.cursorrules
+
+# Claude Code (terminal agent)
+.claude/
+CLAUDE.local.md
+
+# Aider (CLI pair programmer)
+.aider.chat.history.md
+.aider.tags.cache/
+.aider.input.history
+.aider.conf.yml
+
+# Windsurf
+.windsurf/
+.windsurfrules
+
+# Continue & Cline
+.continue/
+.clinerules
+
+# GitHub Copilot & custom prompts
+.copilot-instructions.md
+
+
+# ==============================================================================
+# Environment Secrets & Credentials
+# ==============================================================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 *.pem
 *.key
 secrets.json
 certificates/
 
+
 # ==============================================================================
-# Other Common Ignored Files
+# IDE Caches & OS System Files
 # ==============================================================================
-AGENTS.md
+# VS Code
+.vscode/
+
+# JetBrains (RustRover, CLion, IntelliJ)
+.idea/
+*.iml
+
+# Helix & Zed Editors
+.helix/
+.zed/
+
+# Vim / Neovim swap and session files
+*.swp
+*.swo
+Session.vim
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows system files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
