@@ -20,6 +20,7 @@ rustc-ice-*.txt
 # --- EXCEPTIONS (Do NOT ignore these) ---
 # Negate the blanket ignore above for directories and configurations essential
 # for team collaboration and repository workflows.
+!.git/            # CRUCIAL: Prevents CI and copy tools from skipping the .git folder
 !.gitignore
 !.gitattributes
 !.editorconfig
