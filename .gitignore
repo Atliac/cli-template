@@ -1,5 +1,43 @@
-dist/
-target/
-node_modules/
-package-lock.json
-package.json
+# ==============================================================================
+# Rust / Cargo Build Artifacts
+# ==============================================================================
+/target/
+/debug/
+
+# Rustfmt backup files and compiler crash dumps
+**/*.rs.bk
+rustc-ice-*.txt
+
+# MSVC Windows debugging files
+*.pdb
+
+# ==============================================================================
+# General Dotfile Blanket Rule
+# ==============================================================================
+# Ignore all files and directories starting with a dot.
+.*
+
+# --- EXCEPTIONS (Do NOT ignore these) ---
+# Negate the blanket ignore above for directories and configurations essential
+# for team collaboration and repository workflows.
+!.gitignore
+!.gitattributes
+!.editorconfig
+!.github/
+!.cargo/
+
+
+# ==============================================================================
+# Secrets & Credentials (Safety Net)
+# ==============================================================================
+# Additional safety rules to catch credentials that might not start with a dot.
+.env*
+*.pem
+*.key
+secrets.json
+certificates/
+
+# ==============================================================================
+# Other Common Ignored Files
+# ==============================================================================
+AGENTS.md
