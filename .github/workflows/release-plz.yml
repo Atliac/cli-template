@@ -12,7 +12,7 @@ jobs:
     name: Release-plz release
     runs-on: ubuntu-latest
     # To avoid release-plz failing in forks
-    if: github.repository == 'Atliac/cli-template'
+    if: &repo_check github.repository == 'Atliac/cli-template'
     permissions:
       contents: write
       pull-requests: read
@@ -39,7 +39,7 @@ jobs:
     name: Release-plz PR
     runs-on: ubuntu-latest
     # To avoid release-plz failing in forks
-    if: github.repository == 'Atliac/cli-template'
+    if: *repo_check
     permissions:
       contents: write
       pull-requests: write
