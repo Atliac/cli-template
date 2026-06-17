@@ -1,6 +1,7 @@
 # 🚀 CLI Template
 
-![License](https://img.shields.io/crates/l/wgc)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE-APACHE)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE-MIT)
 ![Development: Active](https://img.shields.io/badge/Development-Active-blue)
 
 A minimal, production-ready Rust template designed to jumpstart command-line interface (CLI) development. It establishes a workspace-friendly structure and comes pre-configured with automated release pipelines, versioning, and cross-platform distribution.
