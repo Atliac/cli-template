@@ -23,10 +23,10 @@ jobs:
             }
 
             // 2. Skip if the PR author is the repo owner, a collaborator, or an org member
-            const association = context.payload.pull_request.author_association;
-            if (association === 'OWNER' || association === 'COLLABORATOR' || association === 'MEMBER') {
-              return;
-            }
+            # const association = context.payload.pull_request.author_association;
+            # if (association === 'OWNER' || association === 'COLLABORATOR' || association === 'MEMBER') {
+            #   return;
+            # }
 
             const prNumber = context.issue.number;
 
