@@ -23,10 +23,10 @@ jobs:
             }
 
             // 2. Skip if the PR author is the repo owner, a collaborator, or an org member
-            # const association = context.payload.pull_request.author_association;
-            # if (association === 'OWNER' || association === 'COLLABORATOR' || association === 'MEMBER') {
-            #   return;
-            # }
+            const association = context.payload.pull_request.author_association;
+            if (association === 'OWNER' || association === 'COLLABORATOR' || association === 'MEMBER') {
+              return;
+            }
 
             const prNumber = context.issue.number;
 
@@ -49,91 +49,64 @@ jobs:
 
             const baseBranch = context.payload.pull_request.base.ref;
 
-            // Helper to strip leading indentation from template literals
-            function dedent(strings, ...values) {
-              const raw = typeof strings === 'string' ? [strings] : strings.raw;
-              let result = '';
-              for (let i = 0; i < raw.length; i++) {
-                result += raw[i].replace(/\\\n[ \t]*/g, '').replace(/\\`/g, '`');
-                if (i < values.length) {
-                  result += values[i];
-                }
-              }
-              const lines = result.split('\n');
-              let minIndent = null;
-              for (const line of lines) {
-                const match = line.match(/^(\s+)\S+/);
-                if (match) {
-                  const indent = match[1].length;
-                  if (minIndent === null || indent < minIndent) {
-                    minIndent = indent;
-                  }
-                }
-              }
-              if (minIndent !== null) {
-                return lines.map(line => line.startsWith(' '.repeat(minIndent)) ? line.slice(minIndent) : line).join('\n');
-              }
-              return result;
-            }
-
-            const commentBody = dedent`
-            ## Welcome and Thank You! 👋
-
-            Thank you for opening this pull request!
-
-            ### ⏳ Note on Review Times
-
-            The maintainer may not react immediately. This is expected and normal, as the project is maintained as time permits. Thank you for your patience!
-
-            ### 🔗 For the PR Contributor
-
-            1. **Link and Auto-Close Issues:**
-
-               If this PR fixes any existing issues, please make sure to include closing keywords (such as \`closes #123\` or \`fixes #456\`) in your first PR message (the main description). This links the issues and automatically closes them when this PR is merged.
-
-            2. **Invite Reviewers on Linked Issues:**
-
-               If this is a non-trivial PR, please leave a comment on the linked issues to invite others to review your changes. You can copy and paste the encouraging template below:
-
-               \`\`\`text
-               Hey everyone! I have opened a PR (#${prNumber}) to resolve this issue. I am inviting you to help test and review the PR!
-
-               - **No write access is needed** to participate or leave a review.
-               - **No deep understanding of the codebase is required**—you can simply verify if the changes fix the problem for you and do not introduce new issues.
-               - **Everyone benefits from multiple reviews** because diverse testing and feedback ensure the fix is robust, does not break other features, and gives the maintainer the confidence to merge the changes quickly.
-
-               If you have a moment to check it out and leave your feedback or approval, it would be greatly appreciated!
-               \`\`\`
-
-            ### 🔍 For Everyone (No Write Access Needed!)
-            Anyone can help review and approve this PR. Here is how you can participate:
-
-            1. **Inspect for Malicious Code:**
-
-               Go to the **"Files changed"** tab, or check out the PR locally to inspect the changes:
-               \`\`\`bash
-               gh pr checkout ${prNumber}
-               git diff origin/${baseBranch}
-               \`\`\`
-               *(Note: This step only requires checking for obvious safety/security issues, and does not require deep understanding of the codebase.)*
-
-            2. **Run the Project:**
-
-               Run the project against this PR locally to tell if issues are solved and new issues introduced.
-
-            3. **Submit a Review:**
-
-               * If you find issues, submit a review or leave a comment with your feedback.
-               * If everything looks correct, submit an **Approve** review (or leave a comment stating you approve) and briefly explain what you checked/tested.
-
-            ### 🛠️ For the Maintainer
-
-            If this PR is reviewed and approved by **two or more independent (standalone) reviewers**, it will significantly speed up the merge progress.
-
-            ---
-
-            _Automated message maintained by [Atliac](https://github.com/Atliac)._
-            `;
+            const commentBody = [
+              '## Welcome and Thank You! 👋',
+              '',
+              'Thank you for opening this pull request!',
+              '',
+              '### ⏳ Note on Review Times',
+              '',
+              'The maintainer may not react immediately. This is expected and normal, as the project is maintained as time permits. Thank you for your patience!',
+              '',
+              '### 🔗 For the PR Contributor',
+              '',
+              '1. **Link and Auto-Close Issues:**',
+              '',
+              '   If this PR fixes any existing issues, please make sure to include closing keywords (such as `closes #123` or `fixes #456`) in your first PR message (the main description). This links the issues and automatically closes them when this PR is merged.',
+              '',
+              '2. **Invite Reviewers on Linked Issues:**',
+              '',
+              '   If this is a non-trivial PR, please leave a comment on the linked issues to invite others to review your changes. You can copy and paste the encouraging template below:',
+              '',
+              '   ```text',
+              `   Hey everyone! I have opened a PR (#${prNumber}) to resolve this issue. I am inviting you to help test and review the PR!`,
+              '',
+              '   - **No write access is needed** to participate or leave a review.',
+              '   - **No deep understanding of the codebase is required**—you can simply verify if the changes fix the problem for you and do not introduce new issues.',
+              '   - **Everyone benefits from multiple reviews** because diverse testing and feedback ensure the fix is robust, does not break other features, and gives the maintainer the confidence to merge the changes quickly.',
+              '',
+              '   If you have a moment to check it out and leave your feedback or approval, it would be greatly appreciated!',
+              '   ```',
+              '',
+              '### 🔍 For Everyone (No Write Access Needed!)',
+              'Anyone can help review and approve this PR. Here is how you can participate:',
+              '',
+              '1. **Inspect for Malicious Code:**',
+              '',
+              '   Go to the **"Files changed"** tab, or check out the PR locally to inspect the changes:',
+              '   ```bash',
+              `   gh pr checkout ${prNumber}`,
+              `   git diff origin/${baseBranch}`,
+              '   ```',
+              '   *(Note: This step only requires checking for obvious safety/security issues, and does not require deep understanding of the codebase.)*',
+              '',
+              '2. **Run the Project:**',
+              '',
+              '   Run the project against this PR locally to tell if issues are solved and new issues introduced.',
+              '',
+              '3. **Submit a Review:**',
+              '',
+              '   * If you find issues, submit a review or leave a comment with your feedback.',
+              '   * If everything looks correct, submit an **Approve** review (or leave a comment stating you approve) and briefly explain what you checked/tested.',
+              '',
+              '### 🛠️ For the Maintainer',
+              '',
+              'If this PR is reviewed and approved by **two or more independent (standalone) reviewers**, it will significantly speed up the merge progress.',
+              '',
+              '---',
+              '',
+              '_Automated message maintained by [Atliac](https://github.com/Atliac)._'
+            ].join('\n');
 
             await github.rest.issues.createComment({
               issue_number: prNumber,
