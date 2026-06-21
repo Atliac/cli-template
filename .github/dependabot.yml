@@ -8,7 +8,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly" # Options: "daily", "weekly", "monthly"
+      interval: "monthly" # Options: "daily", "weekly", "monthly"
 
     # --- Optional Settings ---
     open-pull-requests-limit: 3
@@ -27,7 +27,7 @@ updates:
   - package-ecosystem: "cargo"
     directory: "/"
     schedule:
-      interval: "weekly" # Options: "daily", "weekly", "monthly"
+      interval: "monthly" # Options: "daily", "weekly", "monthly"
 
     # --- Optional Settings ---
 
