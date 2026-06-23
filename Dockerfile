@@ -20,7 +20,7 @@ RUN rustc --version && cargo --version
 RUN if [ "${TARGETARCH}" = "arm64" ]; then \
       dpkg --add-architecture arm64 && \
       apt-get update && \
-      apt-get install -y --no-install-recommends gcc-aarch64-linux-gnu; \
+      apt-get install -y gcc-aarch64-linux-gnu; \
     fi
 
 # Always set the aarch64 linker — harmless on amd64 builds
