@@ -1,0 +1,133 @@
+name: Container
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v[0-9]*.[0-9]*.[0-9]*'
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMAGE_NAME: ${{ github.event.repository.name }}
+  PUSH_TO_GHCR: true               # Set to false to skip ghcr.io
+  PLATFORMS: linux/amd64,linux/arm64  # Set to 'linux/amd64' for amd64-only
+
+jobs:
+  container:
+    name: Build & push container image
+    runs-on: ubuntu-latest
+    # Gate on the owning repo to avoid failures in forks.
+    # Replace 'Atliac/cli-template' with '<your-username>/<your-repo>'.
+    if: github.repository == 'Atliac/cli-template'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      # ── Set up Docker Buildx ───────────────────────────────────────────────
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      # ── Normalize image name to lowercase ──────────────────────────────────
+      # Docker and GHCR both require strictly-lowercase repository / image paths.
+      - name: Lowercase image name
+        run: echo "IMAGE_NAME=${IMAGE_NAME,,}" >> "$GITHUB_ENV"
+
+      # ── Determine target registries ────────────────────────────────────────
+      - name: Determine target registries
+        id: registries
+        env:
+          DH_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+          DH_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          REGISTRIES=""
+          IMAGES=""
+
+          echo "::group::Registry selection"
+
+          # ghcr.io
+          if [[ "${{ env.PUSH_TO_GHCR }}" == "true" ]]; then
+            echo "  [ghcr.io] enabled"
+            REGISTRIES="$REGISTRIES ghcr.io"
+            IMAGES="ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}"
+          else
+            echo "  [ghcr.io] skipped (PUSH_TO_GHCR=false)"
+          fi
+
+          # Docker Hub — automatically enabled when secrets are present
+          if [[ -n "$DH_USER" && -n "$DH_TOKEN" ]]; then
+            echo "  [docker.io] enabled (secrets detected)"
+            REGISTRIES="$REGISTRIES docker.io"
+            DH_IMAGE="$DH_USER/${{ env.IMAGE_NAME }}"
+            if [[ -n "$IMAGES" ]]; then
+              IMAGES+=$'\n'"$DH_IMAGE"
+            else
+              IMAGES="$DH_IMAGE"
+            fi
+          else
+            echo "  [docker.io] skipped (no secrets)"
+          fi
+
+          REGISTRIES="${REGISTRIES# }"
+
+          if [[ -z "$REGISTRIES" ]]; then
+            echo "::error:: No registries configured. Please enable GHCR or configure Docker Hub secrets."
+            exit 1
+          fi
+
+          echo "Registries: $REGISTRIES"
+          echo "Images: $IMAGES"
+          echo "::endgroup::"
+
+          echo "list=$REGISTRIES" >> "$GITHUB_OUTPUT"
+          echo "images<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$IMAGES" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      # ── Generate image metadata (tags & labels) ────────────────────────────
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.registries.outputs.images }}
+          tags: |
+            type=ref,event=tag
+            type=raw,value=latest,enable=${{ github.ref_type == 'tag' && !contains(github.ref, '-') }}
+            type=sha,prefix=,format=short
+
+      # ── Log in to ghcr.io ────────────────────────────────────────────────
+      - name: Log in to GitHub Container Registry
+        if: contains(steps.registries.outputs.list, 'ghcr.io')
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── Log in to Docker Hub ───────────────────────────────────────────────
+      - name: Log in to Docker Hub
+        if: contains(steps.registries.outputs.list, 'docker.io')
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # ── Build and push ────────────────────────────────────────────────────
+      - name: Build and push
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: ${{ env.PLATFORMS }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

@@ -56,6 +56,28 @@ Run `dist build` to test the build on your local platform.
 
 You can rerun `dist init` at any time to update your configuration.
 
+#### Container
+
+Build and publish OCI container images — works independently of `cargo-dist`. Both Podman and Docker are supported; the examples below use `podman` but `docker` works the same way.
+
+**Local build:**
+
+```bash
+podman build -t <your-repo> .
+podman run --rm <your-repo>
+podman run --rm -it <your-repo>             # interactive CLIs
+podman run --rm <your-repo> <other-bin>     # multi-bin workspaces
+```
+
+The Dockerfile uses BuildKit cache mounts for incremental rebuilds and `COPY . .` to automatically handle any workspace structure — no manual config needed for new members.
+
+**Publishing via CI:**
+
+The included [`.github/workflows/container.yml`](.github/workflows/container.yml) workflow pushes to **ghcr.io** on every version tag — no secrets needed. If you add `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` secrets, Docker Hub is enabled automatically.
+
+1. **Enable the workflow**: Replace `Atliac/cli-template` with `<your-username>/<your-repo>` in the `if:` guard.
+2. **Disable ghcr.io** (optional): Set `PUSH_TO_GHCR: false` in the `env` block.
+
 ## 📜 License
 
 This project is dual-licensed under:
