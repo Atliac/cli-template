@@ -21,7 +21,7 @@ COPY . .
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/local/cargo/git \
     --mount=type=cache,target=/app/target \
-    cargo build --release --locked --workspace && \
+    cargo build --release --workspace && \
     mkdir -p /out && \
     for dir in */; do \
       [ -f "$dir/Cargo.toml" ] || continue; \
