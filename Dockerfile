@@ -20,7 +20,7 @@ RUN rustc --version && cargo --version
 RUN if [ "${TARGETARCH}" = "arm64" ]; then \
       dpkg --add-architecture arm64 && \
       apt-get update && \
-      apt-get install -y gcc-aarch64-linux-gnu; \
+      apt-get install -y gcc-aarch64-linux-gnu libc6-dev-arm64-cross; \
     fi
 
 # Always set the aarch64 linker — harmless on amd64 builds
@@ -69,4 +69,4 @@ WORKDIR /app
 
 USER appuser
 
-CMD exec /usr/local/bin/$DEFAULT_BIN
+CMD ["/bin/sh", "-c", "exec /usr/local/bin/${DEFAULT_BIN}"]
