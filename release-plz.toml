@@ -16,6 +16,12 @@ git_release_enable = false
 # Labels to apply to the release pull request opened by release-plz
 pr_labels = ["release"]
 
+# If true, release-plz will look for existing git tags to determine
+# the current version, rather than checking the cargo registry.
+# This is useful for packages that are not published to crates.io but still need version management.
+# git_only and publish cannot both be true for the same package.
+git_only = true
+
 # Don't publish to crates.io by default.
 publish = false
 
