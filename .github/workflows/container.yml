@@ -129,6 +129,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: ${{ env.PLATFORMS }}
-          build-args: DEFAULT_BIN=${{ env.IMAGE_NAME }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
