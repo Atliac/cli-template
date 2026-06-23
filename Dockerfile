@@ -9,31 +9,11 @@
 # Change this to your primary binary name.
 ARG DEFAULT_BIN=cli-template
 
-FROM --platform=$BUILDPLATFORM rust:bookworm AS builder
+FROM rust:bookworm AS builder
 
-ARG TARGETARCH
 ARG DEFAULT_BIN
 
 RUN rustc --version && cargo --version
-
-# Install cross-compilation toolchain for non-native targets
-RUN if [ "${TARGETARCH}" = "arm64" ]; then \
-      dpkg --add-architecture arm64 && \
-      apt-get update && \
-      apt-get install -y gcc-aarch64-linux-gnu libc6-dev-arm64-cross; \
-    fi
-
-# Always set the aarch64 linker — harmless on amd64 builds
-ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc
-
-# Determine Rust target triple and install it
-RUN RUST_TARGET=$(case "${TARGETARCH}" in \
-      amd64) echo "x86_64-unknown-linux-gnu" ;; \
-      arm64) echo "aarch64-unknown-linux-gnu" ;; \
-      *)     echo "Unsupported: ${TARGETARCH}" >&2; exit 1 ;; \
-    esac) && \
-    rustup target add "${RUST_TARGET}" && \
-    echo "${RUST_TARGET}" > /rust_target
 
 WORKDIR /app
 COPY . .
@@ -41,13 +21,12 @@ COPY . .
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/local/cargo/git \
     --mount=type=cache,target=/app/target \
-    RUST_TARGET=$(cat /rust_target) && \
-    cargo build --release --locked --workspace --target "${RUST_TARGET}" && \
+    cargo build --release --locked --workspace && \
     mkdir -p /out && \
     for dir in */; do \
       [ -f "$dir/Cargo.toml" ] || continue; \
       pkg=$(grep '^name' "$dir/Cargo.toml" | head -1 | sed 's/.*= *"\(.*\)".*/\1/'); \
-      [ -n "$pkg" ] && [ -f "target/${RUST_TARGET}/release/$pkg" ] && cp "target/${RUST_TARGET}/release/$pkg" /out/ || true; \
+      [ -n "$pkg" ] && [ -f "target/release/$pkg" ] && cp "target/release/$pkg" /out/ || true; \
     done
 
 # ══════════════════════════════════════════════════════════════════════════════
