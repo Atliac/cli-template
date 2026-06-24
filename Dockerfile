@@ -3,19 +3,16 @@
 # Usage (Podman or Docker — both work):
 #   podman build -t cli-template .
 #   podman run --rm cli-template
-#   podman run --rm cli-template <other-bin>          # run a different binary
+#   podman run --rm cli-template --help               # pass flags to the binary
+#   podman run --rm --entrypoint <other-bin> cli-template  # run a different binary
 #   podman run --rm -it cli-template                  # use -it for interactive CLIs
 
-# Change this to your primary binary name.
-ARG DEFAULT_BIN=cli-template
-
 FROM rust:bookworm AS builder
-
-ARG DEFAULT_BIN
 
 RUN rustc --version && cargo --version
 
 WORKDIR /app
+
 COPY . .
 
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
@@ -34,9 +31,6 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry \
 # ══════════════════════════════════════════════════════════════════════════════
 FROM debian:bookworm-slim
 
-ARG DEFAULT_BIN
-ENV DEFAULT_BIN=$DEFAULT_BIN
-
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
@@ -48,4 +42,5 @@ WORKDIR /app
 
 USER appuser
 
-CMD ["/bin/sh", "-c", "exec /usr/local/bin/${DEFAULT_BIN}"]
+# Change this to your primary binary name.
+ENTRYPOINT ["cli-template"]
