@@ -9,6 +9,8 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly" # Options: "daily", "weekly", "monthly"
+    exclude-paths:
+      - ".github/workflows/release.yml
 
     # --- Optional Settings ---
     open-pull-requests-limit: 3
